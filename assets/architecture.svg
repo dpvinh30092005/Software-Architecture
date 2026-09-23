@@ -9,37 +9,43 @@
 
   <!-- Title -->
   <text x="480" y="50" text-anchor="middle" font-size="30" font-weight="700" fill="#f8fafc">Software Architecture</text>
-  <text x="480" y="78" text-anchor="middle" font-size="15" fill="#94a3b8">từ Monolith tới Microservices — kể bằng một cái Quiz App</text>
+  <text x="480" y="78" text-anchor="middle" font-size="15" fill="#94a3b8">the same quiz app, built twice. one of them is sweating.</text>
 
   <!-- ============ MONOLITH ============ -->
   <rect x="30" y="95" width="360" height="400" rx="20" fill="#1e293b" stroke="#334155"/>
   <text x="210" y="122" text-anchor="middle" font-size="14" font-weight="700" letter-spacing="3" fill="#fb923c">MONOLITH</text>
 
   <!-- the big guy -->
-  <rect x="110" y="135" width="200" height="210" rx="18" fill="#f97316"/>
+  <rect x="70" y="135" width="200" height="210" rx="18" fill="#f97316"/>
   <!-- face: nervous -->
-  <circle cx="180" cy="162" r="6" fill="#1e293b"/>
-  <circle cx="240" cy="162" r="6" fill="#1e293b"/>
-  <path d="M183 182 q9 -7 18 0 q9 7 18 0 q9 -7 18 0" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
-  <path d="M282 146 q6 10 0 16 q-6 -6 0 -16 z" fill="#7dd3fc"/>
+  <circle cx="140" cy="162" r="6" fill="#1e293b"/>
+  <circle cx="200" cy="162" r="6" fill="#1e293b"/>
+  <path d="M143 182 q9 -7 18 0 q9 7 18 0 q9 -7 18 0" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M242 146 q6 10 0 16 q-6 -6 0 -16 z" fill="#7dd3fc"/>
   <!-- layers -->
-  <rect x="122" y="200" width="176" height="38" rx="8" fill="#ea580c"/>
-  <text x="210" y="224" text-anchor="middle" font-size="14" font-weight="600" fill="#fff7ed">Controller</text>
-  <rect x="122" y="244" width="176" height="38" rx="8" fill="#c2410c"/>
-  <text x="210" y="268" text-anchor="middle" font-size="14" font-weight="600" fill="#fff7ed">Service</text>
-  <rect x="122" y="288" width="176" height="38" rx="8" fill="#9a3412"/>
-  <text x="210" y="312" text-anchor="middle" font-size="14" font-weight="600" fill="#fff7ed">DAO</text>
+  <rect x="82" y="200" width="176" height="38" rx="8" fill="#ea580c"/>
+  <text x="170" y="224" text-anchor="middle" font-size="14" font-weight="600" fill="#fff7ed">Controller</text>
+  <rect x="82" y="244" width="176" height="38" rx="8" fill="#c2410c"/>
+  <text x="170" y="268" text-anchor="middle" font-size="14" font-weight="600" fill="#fff7ed">Service</text>
+  <rect x="82" y="288" width="176" height="38" rx="8" fill="#9a3412"/>
+  <text x="170" y="312" text-anchor="middle" font-size="14" font-weight="600" fill="#fff7ed">DAO</text>
 
   <!-- single db -->
-  <line x1="210" y1="345" x2="210" y2="378" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow)"/>
-  <path d="M155 390 v42 a55 12 0 0 0 110 0 v-42" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
-  <ellipse cx="210" cy="390" rx="55" ry="12" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="210" y="421" text-anchor="middle" font-size="13" fill="#e2e8f0">questiondb</text>
+  <line x1="170" y1="345" x2="170" y2="378" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M115 390 v42 a55 12 0 0 0 110 0 v-42" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+  <ellipse cx="170" cy="390" rx="55" ry="12" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="170" y="421" text-anchor="middle" font-size="13" fill="#e2e8f0">questiondb</text>
 
-  <text x="210" y="474" text-anchor="middle" font-size="13" fill="#94a3b8">1 app · 1 DB · deploy một phát</text>
+  <!-- speech bubble -->
+  <rect x="284" y="146" width="96" height="50" rx="12" fill="#f8fafc"/>
+  <path d="M285 164 L270 174 L285 180 z" fill="#f8fafc"/>
+  <text x="332" y="166" text-anchor="middle" font-size="12" fill="#0f172a">i do</text>
+  <text x="332" y="184" text-anchor="middle" font-size="12" font-weight="800" fill="#0f172a">EVERYTHING</text>
+
+  <text x="210" y="474" text-anchor="middle" font-size="13" fill="#94a3b8">1 app · 1 DB · deploy and pray</text>
 
   <!-- ============ SPLIT ARROW ============ -->
-  <text x="435" y="276" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">tách ra</text>
+  <text x="435" y="276" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">break it up</text>
   <line x1="400" y1="290" x2="468" y2="290" stroke="#cbd5e1" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
 
   <!-- ============ MICROSERVICES ============ -->
@@ -86,5 +92,5 @@
   <text x="705" y="418" text-anchor="middle" font-size="13" font-weight="600" fill="#f1f5f9">service-registry</text>
   <text x="705" y="435" text-anchor="middle" font-size="11" fill="#cbd5e1">(Eureka)</text>
 
-  <text x="705" y="474" text-anchor="middle" font-size="13" fill="#94a3b8">n app · n DB · đứa nào tự deploy đứa đó</text>
+  <text x="705" y="474" text-anchor="middle" font-size="13" fill="#94a3b8">n apps · n DBs · n times the YAML</text>
 </svg>
