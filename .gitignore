@@ -1,0 +1,11 @@
+# Secrets
+.env
+*.env
+
+# Build output
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
