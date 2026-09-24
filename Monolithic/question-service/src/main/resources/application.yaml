@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: question-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/questiondb
+    username: postgres
+    password: ${DB_PASSWORD:your_password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+debug: false
+eureka:
+  instance:
+    prefer-ip-address: true
+

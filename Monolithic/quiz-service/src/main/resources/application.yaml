@@ -1,0 +1,20 @@
+spring:
+    application:
+        name: quiz-service
+    datasource:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/quizdb
+      username: postgres
+      password: ${DB_PASSWORD:your_password}
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+
+
+debug: false
+server:
+    port: 8090
+eureka:
+    instance:
+        prefer-ip-address: true
