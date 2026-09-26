@@ -10,8 +10,38 @@ spring:
       hibernate:
         ddl-auto: update
       show-sql: true
+    cloud:
+      openfeign:
+        circuitbreaker:
+          enabled: true
+#          group:
+#            enabled: true  #group: false  →  tên là  QuizInterface#getQuestionsForQuiz(String,Integer)
+#                          #group: true   →  tên là  QUESTION-SERVICE
 
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10                                     #	Xét 10 lời gọi gần nhất
+        minimum-number-of-calls: 5                                  #   Chưa đủ 5 lời gọi thì không bao giờ mở
+        failure-rate-threshold: 50                                  #   Một nửa số lời gọi hỏng = bên kia thật sự có vấn đề
+        wait-duration-in-open-state: 10s                            #   Ngừng gọi bao lâu trước khi thử lại
+        permitted-number-of-calls-in-half-open-state: 3             #   Thả 3 lời gọi thăm dò
+        automatic-transition-from-open-to-half-open-enabled: true
+        register-health-indicator: true
+    instances:
+      QUESTION-SERVICE:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+        cancel-running-future: true
+    instances:
+      QUESTION-SERVICE: # ← thêm, trước chỉ có configs
+        base-config: default
 debug: false
 server:
     port: 8090
@@ -25,3 +55,13 @@ management:
         export:
             zipkin:
                 endpoint: http://localhost:9411/api/v2/spans
+    endpoints:
+      web:
+        exposure:
+          include: health,circuitbreakers,circuitbreakerevents,metrics
+    endpoint:
+      health:
+        show-details: always
+    health:
+      circuitbreakers:
+        enabled: true

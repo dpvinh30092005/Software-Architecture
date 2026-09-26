@@ -9,3 +9,6 @@ target/
 .idea/
 *.iml
 .vscode/
+
+# Build archive
+Monolithic.zip

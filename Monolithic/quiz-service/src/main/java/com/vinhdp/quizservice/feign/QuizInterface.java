@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient("QUESTION-SERVICE")
+@FeignClient(value = "QUESTION-SERVICE", fallbackFactory = QuizInterfaceFallback.class)
 public interface QuizInterface {
 
     @GetMapping("question/generate")
