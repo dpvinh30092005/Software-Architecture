@@ -1,0 +1,71 @@
+### =====================================================================
+### Project requests - open this file in the editor and click "Send Request"
+###
+### VS Code    : install the "REST Client" extension (humao.rest-client),
+###              then a "Send Request" link appears above each ### block
+### IntelliJ   : built-in HTTP Client, a green arrow appears in the gutter
+###
+### Nothing to install on the server side, and no cmd involved.
+### =====================================================================
+
+@quiz     = http://127.0.0.1:8090
+@question = http://127.0.0.1:8081
+@gateway  = http://127.0.0.1:8765
+
+
+### ---------------------------------------------------------------- 1
+### Circuit breaker state. Watch: state, bufferedCalls, failedCalls,
+### notPermittedCalls. This is the request to re-send during the demo.
+GET {{quiz}}/actuator/circuitbreakers
+
+
+### ---------------------------------------------------------------- 2
+### State transition log - CLOSED -> OPEN -> HALF_OPEN -> CLOSED,
+### each with a timestamp.
+GET {{quiz}}/actuator/circuitbreakerevents
+
+
+### ---------------------------------------------------------------- 3
+### Create a quiz, straight to quiz-service.
+### question-service up   -> 201 Created
+### question-service down -> 503 from the fallback (once createQuiz checks it)
+POST {{quiz}}/quiz/create
+Content-Type: application/json
+
+{
+  "category": "java",
+  "numQ": 2,
+  "title": "Spring Quiz"
+}
+
+
+### ---------------------------------------------------------------- 4
+### Same call through the API gateway.
+### The service id must be LOWERCASE: lower-case-service-id is true in
+### api-gateway/application.yaml, so /QUIZ-SERVICE/... returns 404.
+POST {{gateway}}/quiz-service/quiz/create
+Content-Type: application/json
+
+{
+  "category": "java",
+  "numQ": 2,
+  "title": "Spring Quiz"
+}
+
+
+### ---------------------------------------------------------------- 5
+### question-service directly, to prove whether it is up.
+### Refused here = the breaker is about to start counting failures.
+GET {{question}}/question/allQuestions
+
+
+### ---------------------------------------------------------------- 6
+### Health. With register-health-indicator on, the circuitBreakers
+### component shows up here too.
+GET {{quiz}}/actuator/health
+
+
+### ---------------------------------------------------------------- 7
+### Eureka registry as JSON - which instances are registered right now.
+GET http://127.0.0.1:8761/eureka/apps
+Accept: application/json

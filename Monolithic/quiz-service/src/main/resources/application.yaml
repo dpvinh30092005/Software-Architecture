@@ -1,67 +1,136 @@
+server:
+  port: 8090
+
 spring:
-    application:
-        name: quiz-service
-    datasource:
-      driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://localhost:5432/quizdb
-      username: postgres
-      password: ${DB_PASSWORD:your_password}
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-    cloud:
-      openfeign:
-        circuitbreaker:
+  application:
+    name: quiz-service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/quizdb
+    username: postgres
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  cache:
+    type: caffeine
+    cache-names: questions
+    caffeine:
+      # recordStats is what makes Caffeine publish hit/miss counters. Without it
+      # Prometheus only sees cache_size and the hit ratio cannot be graphed.
+      spec: maximumSize=500,expireAfterWrite=60s,recordStats
+
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
           enabled: true
-#          group:
-#            enabled: true  #group: false  →  tên là  QuizInterface#getQuestionsForQuiz(String,Integer)
-#                          #group: true   →  tên là  QUESTION-SERVICE
+
+  devtools:
+    restart:
+      enabled: false
+
+eureka:
+  instance:
+    prefer-ip-address: true
 
 
 resilience4j:
+
   circuitbreaker:
     configs:
       default:
         sliding-window-type: COUNT_BASED
-        sliding-window-size: 10                                     #	Xét 10 lời gọi gần nhất
-        minimum-number-of-calls: 5                                  #   Chưa đủ 5 lời gọi thì không bao giờ mở
-        failure-rate-threshold: 50                                  #   Một nửa số lời gọi hỏng = bên kia thật sự có vấn đề
-        wait-duration-in-open-state: 10s                            #   Ngừng gọi bao lâu trước khi thử lại
-        permitted-number-of-calls-in-half-open-state: 3             #   Thả 3 lời gọi thăm dò
+        sliding-window-size: 10                       # judge on the last 10 calls
+        minimum-number-of-calls: 5                    # below this, never decide
+        failure-rate-threshold: 50                    # half failing = really broken
+        slow-call-rate-threshold: 50                  # half slow = also broken
+        slow-call-duration-threshold: 2s              # "slow" means over 2s
+        wait-duration-in-open-state: 10s              # production: 30-60s
+        permitted-number-of-calls-in-half-open-state: 3
         automatic-transition-from-open-to-half-open-enabled: true
+        register-health-indicator: true
+        allow-health-indicator-to-fail: false         # THEIR outage must not mark US down
+        ignore-exceptions:                            # our own back-pressure, not their fault
+          - io.github.resilience4j.ratelimiter.RequestNotPermitted
+          - io.github.resilience4j.bulkhead.BulkheadFullException
+    instances:
+      QUESTION-SERVICE:
+        base-config: default
+
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s                          # turns "hanging" into "failed"
+        cancel-running-future: true                   # release the thread, do not leak it
+    instances:
+      QUESTION-SERVICE:
+        base-config: default
+
+  retry:
+    configs:
+      default:
+        max-attempts: 3                               # 1 original call + 2 retries
+        wait-duration: 300ms
+        enable-exponential-backoff: true              # 300ms -> 600ms
+        exponential-backoff-multiplier: 2
+        ignore-exceptions:                            # retrying these is pointless
+          - io.github.resilience4j.circuitbreaker.CallNotPermittedException
+          - io.github.resilience4j.ratelimiter.RequestNotPermitted
+          - io.github.resilience4j.bulkhead.BulkheadFullException
+    instances:
+      QUESTION-SERVICE:
+        base-config: default
+
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 5                           # 5 calls...
+        limit-refresh-period: 10s                     # ...per 10 seconds
+        timeout-duration: 0                           # 0 = reject at once, do not queue
         register-health-indicator: true
     instances:
       QUESTION-SERVICE:
         base-config: default
-  timelimiter:
+
+  bulkhead:
     configs:
       default:
-        timeout-duration: 3s
-        cancel-running-future: true
+        max-concurrent-calls: 5                       # at most 5 threads in flight
+        max-wait-duration: 0                          # 0 = reject at once
     instances:
-      QUESTION-SERVICE: # ← thêm, trước chỉ có configs
+      QUESTION-SERVICE:
         base-config: default
-debug: false
-server:
-    port: 8090
-eureka:
-    instance:
-        prefer-ip-address: true
+
 management:
-    tracing:
-        sampling:
-            probability: 1.0
-        export:
-            zipkin:
-                endpoint: http://localhost:9411/api/v2/spans
-    endpoints:
-      web:
-        exposure:
-          include: health,circuitbreakers,circuitbreakerevents,metrics
-    endpoint:
-      health:
-        show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: >
+          health,metrics,
+          circuitbreakers,circuitbreakerevents,
+          retries,retryevents,
+          ratelimiters,ratelimiterevents,
+          bulkheads,bulkheadevents,
+          timelimiters,timelimiterevents,
+          caches,
+          prometheus
+  endpoint:
     health:
-      circuitbreakers:
-        enabled: true
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      zipkin:
+        endpoint: http://localhost:9411/api/v2/spans

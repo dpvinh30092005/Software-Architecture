@@ -12,3 +12,6 @@ target/
 
 # Build archive
 Monolithic.zip
+
+# IDE / build output
+bin/

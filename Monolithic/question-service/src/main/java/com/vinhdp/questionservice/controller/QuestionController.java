@@ -39,14 +39,14 @@ public class QuestionController {
 
     @GetMapping("generate")
     public ResponseEntity<List<Integer>> getQuestionsForQuiz
-            (@RequestParam String categoryName, @RequestParam Integer numQuestions) {
+            (@RequestParam String categoryName, @RequestParam Integer numQuestions) throws InterruptedException {
         return questionService.getQuestionsForQuiz(categoryName, numQuestions);
     }
     // generate
     // getQuestions (questionId)
 
     @PostMapping("getQuestions")
-    public ResponseEntity<List<QuestionWrapper>> getQuestionsFromId(@RequestBody List<Integer> questionIds) {
+    public ResponseEntity<List<QuestionWrapper>> getQuestionsFromId(@RequestBody List<Integer> questionIds){
         System.out.println(environment.getProperty("local.server.port"));
         return questionService.getQuestionFromId(questionIds);
     }
