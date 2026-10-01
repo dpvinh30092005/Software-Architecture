@@ -101,7 +101,7 @@ resilience4j:
   bulkhead:
     configs:
       default:
-        max-concurrent-calls: 5                       # at most 5 threads in flight
+        max-concurrent-calls: 2                       # at most 5 threads in flight
         max-wait-duration: 0                          # 0 = reject at once
     instances:
       QUESTION-SERVICE:

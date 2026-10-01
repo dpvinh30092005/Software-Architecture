@@ -1,0 +1,12 @@
+# Auto-provisioned on Grafana startup, so there is nothing to click through
+# before the first dashboard works.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090      # container name, both are on the same network
+    isDefault: true
+    editable: true

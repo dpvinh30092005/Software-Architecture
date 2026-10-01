@@ -1,0 +1,35 @@
+global:
+  # Default is 15s. A circuit breaker flips CLOSED -> OPEN in well under a
+  # second, so at 15s the graph lags the event badly. 5s is still not
+  # per-call resolution - use demo-breaker.ps1 for that - but it keeps the
+  # dashboard close enough to follow along.
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+
+  # The Spring services run on the Windows host, not inside Docker, so they are
+  # reached through host.docker.internal rather than a container name.
+  - job_name: spring-services
+    metrics_path: /actuator/prometheus
+    static_configs:
+
+      - targets: ["host.docker.internal:8090"]
+        labels:
+          application: quiz-service          # the one with all the Resilience4j guards
+
+      - targets: ["host.docker.internal:8081"]
+        labels:
+          application: question-service
+
+      - targets: ["host.docker.internal:8765"]
+        labels:
+          application: api-gateway
+
+      - targets: ["host.docker.internal:8761"]
+        labels:
+          application: service-registry
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

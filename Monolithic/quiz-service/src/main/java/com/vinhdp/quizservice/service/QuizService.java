@@ -76,8 +76,11 @@ public class QuizService {
     }
 
     private ResponseEntity<List<QuestionWrapper>> getQuizQuestionFallback(Integer id, Throwable ex) {
+        if (ex instanceof RequestNotPermitted || ex instanceof BulkheadFullException) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();   // 429 - our own limit
+        }
         // A read may degrade to an empty body - nothing is persisted, nothing is lost.
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();     // 503 - their outage
     }
 
     @CacheEvict(cacheNames = "questions", key = "#id")
@@ -93,6 +96,9 @@ public class QuizService {
     }
 
     private ResponseEntity<Integer> calculateResultFallback(Integer id, List<Response> responses, Throwable ex) {
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        if (ex instanceof RequestNotPermitted || ex instanceof BulkheadFullException) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();   // 429 - our own limit
+        }
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();     // 503 - their outage
     }
 }
